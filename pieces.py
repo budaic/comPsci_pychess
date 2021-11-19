@@ -8,7 +8,7 @@ class Piece:
         self.pic = pic
     
     # Returns the moves that could be made without minding check
-    def legalMoves(self, board, enpassantable=None):
+    def legalMoves(self, board, mode=1):
         legal_moves = []
         x = self.position[0]
         y = self.position[1]
@@ -75,7 +75,39 @@ class Piece:
             else:
                 legal_moves.append(l)
 
+        # Leave if we don't need to check for check
+        if mode == 0:
+            return legal_moves
+
+        # Check for check
+        legal_w_check = []
+        theoretical_board = board.copy()*len(legal_moves)
+        for m, t in zip(legal_moves, theoretical_board):
+            locations = [x.position for x in t]
+            # set the selfs position to one of the possible moves in the theoretical boards
+            t[locations.index(self.position)].position = m
+            if m in locations:
+                index = locations.index(m)
+                t.pop(index)
+            if not in_check(t, self.color):
+                legal_w_check.append(m)
+        
         return legal_moves
+
+def in_check(board, color):
+    # Loop through the enemy pieces, to see if any of them are attacking the king
+    e_color = -color+1
+    enemy_moves = {}
+    for e_piece in board:
+        if e_piece.color = e_color:
+            for e in e_piece.legal_moves(board, 0):
+                enemy_moves.add(e)
+    for i, b in enumerate(board):
+        if b.race == 'K' and b.color == color:
+            if b.position in enemy_moves:
+                return True
+    
+    return False
 
 
 br_pic = pygame.image.load('./images/b_rook.png')
